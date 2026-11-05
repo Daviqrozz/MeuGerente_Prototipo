@@ -1,96 +1,203 @@
-import { calcularPrecoRecomendado } from "@/lib/calculos";
-import { Calculator, ShieldAlert, CheckCircle2 } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { FICHAS_EXEMPLO, INSUMOS_EXEMPLO, CANAIS_EXEMPLO } from "@/lib/dados";
+import {
+  calcularCustoPrato,
+  calcularPrecoRecomendado,
+  calcularMargemContribuicao,
+  calcularMargemPercentual,
+} from "@/lib/calculos";
+import { ShieldCheck, AlertTriangle, Calculator } from "lucide-react";
 
 export default function CalculadoraPage() {
-  const custoVariavelExemplo = 12.5; // Custo de ingredientes + embalagem
-  const taxaIfood = 0.23; // 23%
-  const margemAlvoDesejada = 0.25; // 25%
+  const [fichaId, setFichaId] = useState(FICHAS_EXEMPLO[0].id);
+  const [canalId, setCanalId] = useState(CANAIS_EXEMPLO[0].id);
+  const [margemAlvo, setMargemAlvo] = useState(30);
 
-  const precoSugerido = calcularPrecoRecomendado(
-    custoVariavelExemplo,
-    taxaIfood,
-    margemAlvoDesejada
-  );
+  const ficha = FICHAS_EXEMPLO.find((f) => f.id === fichaId)!;
+  const canal = CANAIS_EXEMPLO.find((c) => c.id === canalId)!;
+
+  const custoVariavel = calcularCustoPrato(ficha, INSUMOS_EXEMPLO);
+  const taxaPctDecimal = canal.taxaPercentual > 1 ? canal.taxaPercentual / 100 : canal.taxaPercentual;
+  const taxaTotal = taxaPctDecimal;
+
+  const precoRecomendado = calcularPrecoRecomendado(custoVariavel, taxaTotal, margemAlvo / 100);
+  const denominador = 1 - taxaTotal - margemAlvo / 100;
+
+  const margemCalculada = precoRecomendado
+    ? calcularMargemContribuicao(precoRecomendado, custoVariavel, canal)
+    : 0;
+  const margemPctCalculada = precoRecomendado
+    ? calcularMargemPercentual(margemCalculada, precoRecomendado)
+    : 0;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 mb-2">
-          Precificação Inteligente
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-          Calculadora de Preço de Venda
-        </h1>
-        <p className="text-sm text-zinc-600 mt-1">
-          Descubra por quanto vender no balcão e no delivery para atingir a margem desejada sem prejuízo.
-        </p>
-      </div>
+    <main className="min-h-screen bg-[#faf9f5] px-8 py-8">
+      <div className="max-w-4xl mx-auto flex flex-col gap-6">
 
-      <div className="bg-white rounded-xl border border-zinc-200 p-6 shadow-xs space-y-5">
-        <div>
-          <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-            Simulação de Cálculo com Proteção de Denominador
-          </span>
-          <h2 className="text-lg font-bold text-zinc-900 mt-0.5">
-            Exemplo: Hambúrguer Artesanal no iFood
-          </h2>
-        </div>
+        {/* Cabeçalho */}
+        <section>
+          <h1 className="text-[28px] font-bold text-[#1b1c1a] tracking-tight">
+            Calculadora de Preço
+          </h1>
+          <p className="text-sm text-[#57423b] mt-1">
+            Descubra por quanto vender para bater a margem desejada em cada canal
+          </p>
+        </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-            <span className="text-xs text-zinc-500 block">Custo Variável Total</span>
-            <span className="text-2xl font-bold text-zinc-900 mt-1 block">
-              R$ {custoVariavelExemplo.toFixed(2)}
-            </span>
-            <span className="text-[11px] text-zinc-500">Ingredientes + embalagem</span>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+          {/* Painel de Configuração */}
+          <div className="lg:col-span-2 bg-white rounded-[24px] border border-[#e3e2df]/50 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-6 flex flex-col gap-5">
+            <h2 className="text-sm font-bold text-[#1b1c1a]">Configure o cálculo</h2>
 
-          <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-            <span className="text-xs text-zinc-500 block">Taxas do Canal (iFood)</span>
-            <span className="text-2xl font-bold text-zinc-900 mt-1 block">
-              {(taxaIfood * 100).toFixed(0)}%
-            </span>
-            <span className="text-[11px] text-zinc-500">Comissão de intermediação</span>
-          </div>
-
-          <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-            <span className="text-xs text-zinc-500 block">Margem Alvo Desejada</span>
-            <span className="text-2xl font-bold text-emerald-700 mt-1 block">
-              {(margemAlvoDesejada * 100).toFixed(0)}%
-            </span>
-            <span className="text-[11px] text-zinc-500">Sobra para custos fixos</span>
-          </div>
-        </div>
-
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-1.5 text-emerald-900 font-bold text-base">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span>Preço Recomendado para o Cardápio</span>
+            {/* Seletor de Prato */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-[#57423b] uppercase tracking-wider">
+                1. Qual prato?
+              </label>
+              <div className="flex flex-col gap-1.5">
+                {FICHAS_EXEMPLO.map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFichaId(f.id)}
+                    className={`px-4 py-3 rounded-2xl text-sm font-semibold text-left transition-all ${
+                      fichaId === f.id
+                        ? "bg-[#9f3c16] text-white shadow-sm"
+                        : "bg-[#f5f4f0] text-[#57423b] hover:bg-[#efeeea]"
+                    }`}
+                  >
+                    {f.nomePrato}
+                  </button>
+                ))}
+              </div>
             </div>
-            <p className="text-xs text-emerald-700 mt-1">
-              Fórmula pura: Custo / (1 - Taxas - Margem Alvo) = {custoVariavelExemplo.toFixed(2)} / (1 - {taxaIfood} - {margemAlvoDesejada})
-            </p>
+
+            {/* Seletor de Canal */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-[#57423b] uppercase tracking-wider">
+                2. Qual canal?
+              </label>
+              <div className="flex flex-col gap-1.5">
+                {CANAIS_EXEMPLO.map((c) => {
+                  const taxaFormatada = c.taxaPercentual > 1
+                    ? c.taxaPercentual.toFixed(0)
+                    : (c.taxaPercentual * 100).toFixed(0);
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => setCanalId(c.id)}
+                      className={`px-4 py-3 rounded-2xl text-sm font-semibold text-left transition-all flex items-center justify-between ${
+                        canalId === c.id
+                          ? "bg-[#9f3c16] text-white shadow-sm"
+                          : "bg-[#f5f4f0] text-[#57423b] hover:bg-[#efeeea]"
+                      }`}
+                    >
+                      <span>{c.nome.split("(")[0].trim()}</span>
+                      <span className={`text-xs ${canalId === c.id ? "text-white/80" : "text-[#8a726a]"}`}>
+                        {taxaFormatada}%
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Slider de margem */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-[#57423b] uppercase tracking-wider">
+                3. Meta de sobra: <span className="text-[#9f3c16]">{margemAlvo}%</span>
+              </label>
+              <input
+                type="range"
+                min={5}
+                max={60}
+                value={margemAlvo}
+                onChange={(e) => setMargemAlvo(Number(e.target.value))}
+                className="w-full accent-[#9f3c16] h-1.5 rounded-full"
+              />
+              <div className="flex justify-between text-[11px] text-[#8a726a]">
+                <span>5%</span>
+                <span>30% (recomendado)</span>
+                <span>60%</span>
+              </div>
+            </div>
           </div>
-          <div className="text-right">
-            <span className="text-3xl font-black text-emerald-800">
-              {precoSugerido ? `R$ ${precoSugerido.toFixed(2)}` : "Inviável"}
-            </span>
+
+          {/* Resultado */}
+          <div className="lg:col-span-3 flex flex-col gap-4">
+            {/* Card do resultado principal */}
+            {precoRecomendado ? (
+              <div className="bg-white rounded-[24px] border border-[#e3e2df]/50 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 flex flex-col gap-5">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-[#1b6b42]" />
+                  <span className="text-sm font-bold text-[#1b1c1a]">Preço Recomendado</span>
+                </div>
+
+                <div className="text-center py-4">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-[#57423b] mb-2">
+                    Coloque no cardápio por
+                  </div>
+                  <div className="text-6xl font-black text-[#1b1c1a] tracking-tight">
+                    R$ {precoRecomendado.toFixed(2)}
+                  </div>
+                  <div className="text-sm text-[#57423b] mt-2">
+                    no {canal.nome.split("(")[0].trim()}
+                  </div>
+                </div>
+
+                {/* Desmembramento */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2 border-b border-[#f5f4f0]">
+                    <span className="text-[#57423b]">Custo de fazer o prato</span>
+                    <span className="font-semibold text-[#9f3c16]">R$ {custoVariavel.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-[#f5f4f0]">
+                    <span className="text-[#57423b]">Taxas do canal ({(taxaTotal * 100).toFixed(1)}%)</span>
+                    <span className="font-semibold text-[#9f3c16]">
+                      R$ {(precoRecomendado * taxaTotal + canal.taxaFixa).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 font-bold">
+                    <span className="text-[#1b1c1a]">Sobra por lanche</span>
+                    <span className="text-[#1b6b42] text-lg">
+                      R$ {margemCalculada.toFixed(2)} ({margemPctCalculada.toFixed(0)}%)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Fórmula */}
+                <div className="p-3.5 rounded-[14px] bg-[#f5f4f0] text-xs text-[#57423b]">
+                  <span className="font-semibold text-[#1b1c1a] block mb-1">Como calculei:</span>
+                  R$ {custoVariavel.toFixed(2)} ÷ (1 − {(taxaTotal * 100).toFixed(0)}% − {margemAlvo}%) = <strong className="text-[#1b1c1a]">R$ {precoRecomendado.toFixed(2)}</strong>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-[24px] border border-[#9f3c16]/30 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 flex flex-col items-center gap-4 text-center">
+                <AlertTriangle className="w-10 h-10 text-[#9f3c16]" />
+                <div>
+                  <h3 className="text-lg font-bold text-[#1b1c1a]">Combinação inviável</h3>
+                  <p className="text-sm text-[#57423b] mt-1 leading-relaxed">
+                    A soma das taxas do canal ({(taxaTotal * 100).toFixed(0)}%) com a meta de sobra ({margemAlvo}%) passa de 100%.
+                    Não existe preço que funcione assim. Reduza a meta ou troque de canal.
+                  </p>
+                </div>
+                <div className="p-3 rounded-[14px] bg-[#ffdad6] text-xs text-[#9f3c16] font-semibold">
+                  Denominador calculado: {denominador.toFixed(4)} ≤ 0 → bloqueado pelo sistema
+                </div>
+              </div>
+            )}
+
+            {/* Aviso sobre margem ≠ lucro */}
+            <div className="p-4 rounded-[16px] bg-[#faf9f5] border border-[#e3e2df]/60 flex items-start gap-2 text-xs text-[#57423b]">
+              <Calculator className="w-4 h-4 text-[#57423b] shrink-0 mt-0.5" />
+              <span>
+                A "sobra" é a <strong>margem de contribuição</strong>: ainda cobre aluguel, equipe fixa e contas do restaurante. Não é o que fica no seu bolso no final.
+              </span>
+            </div>
           </div>
         </div>
-
-        <div className="border-t border-zinc-100 pt-4 flex items-center gap-2 text-xs text-zinc-500">
-          <ShieldAlert className="w-4 h-4 text-zinc-400 shrink-0" />
-          <span>
-            <strong>Regra de Bloqueio Ativa:</strong> Se a soma das taxas e da margem alvo for ≥ 100% (denominador ≤ 0), o sistema bloqueia o cálculo e retorna nulo, evitando sugestão de preços impossíveis.
-          </span>
-        </div>
       </div>
-
-      <div className="bg-zinc-100/70 p-4 rounded-xl border border-dashed border-zinc-300 text-center text-xs text-zinc-500">
-        <Calculator className="w-5 h-5 mx-auto mb-1 text-zinc-400" />
-        Placeholder da Calculadora. Sliders e inputs interativos de margem e taxas serão adicionados nos próximos passos.
-      </div>
-    </div>
+    </main>
   );
 }

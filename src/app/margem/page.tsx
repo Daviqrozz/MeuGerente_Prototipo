@@ -1,110 +1,152 @@
-import { CANAIS_EXEMPLO, FICHAS_EXEMPLO, INSUMOS_EXEMPLO } from "@/lib/dados";
+import { FICHAS_EXEMPLO, INSUMOS_EXEMPLO, CANAIS_EXEMPLO, Canal } from "@/lib/dados";
 import {
   calcularCustoPrato,
   calcularMargemContribuicao,
   calcularMargemPercentual,
 } from "@/lib/calculos";
-import { TrendingUp, AlertTriangle } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 
-export default function MargemPage() {
-  const fichaPrincipal = FICHAS_EXEMPLO[0]; // Cheeseburger Clássico
-  const custoBase = calcularCustoPrato(fichaPrincipal, INSUMOS_EXEMPLO);
-  const precoSugeridoVenda = 34.0;
+const PRECOS_DEMO: Record<string, number> = {
+  "ficha-01": 32.0,
+  "ficha-02": 36.0,
+  "ficha-03": 38.0,
+  "ficha-04": 44.0,
+};
+
+function barColor(pct: number) {
+  if (pct >= 45) return "#1b6b42";
+  if (pct >= 28) return "#855000";
+  return "#9f3c16";
+}
+
+function CanalCard({ canal, custoPrato, preco }: { canal: Canal; custoPrato: number; preco: number }) {
+  const taxaPctDecimal = canal.taxaPercentual > 1 ? canal.taxaPercentual / 100 : canal.taxaPercentual;
+  const margem = calcularMargemContribuicao(preco, custoPrato, canal);
+  const margemPct = calcularMargemPercentual(margem, preco);
+  const taxaTotal = preco * taxaPctDecimal + canal.taxaFixa;
+  const color = barColor(margemPct);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 mb-2">
-          Análise de Canais de Venda
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-          Margem de Contribuição por Canal
-        </h1>
-        <p className="text-sm text-zinc-600 mt-1">
-          Veja quanto sobra no bolso após pagar os ingredientes, embalagens e taxas de cada aplicativo.
-        </p>
+    <div className="bg-white rounded-[20px] border border-[#e3e2df]/50 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-bold text-[#1b1c1a]">{canal.nome.split("(")[0].trim()}</span>
+        <span
+          className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+          style={{ backgroundColor: color + "15", color }}
+        >
+          {margemPct.toFixed(0)}% de sobra
+        </span>
       </div>
 
-      {/* Alerta de conformidade com a regra de negócio */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 text-xs text-amber-800">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-        <div>
-          <strong>Aviso importante:</strong> Margem de contribuição <strong>não é lucro líquido</strong>.
-          Despesas fixas do restaurante (como aluguel, luz, salários da equipe e pró-labore) ainda precisam ser cobertas por esta margem.
+      {canal.descricao && (
+        <p className="text-xs text-[#57423b]">{canal.descricao}</p>
+      )}
+
+      <div className="space-y-1.5 text-xs">
+        <div className="flex justify-between text-[#57423b]">
+          <span>Preço de venda</span>
+          <span className="font-semibold text-[#1b1c1a]">R$ {preco.toFixed(2)}</span>
         </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-zinc-200 p-5 shadow-xs space-y-4">
-        <div className="border-b border-zinc-100 pb-3">
-          <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">
-            Exemplo Simulado
-          </span>
-          <h2 className="text-lg font-bold text-zinc-900 mt-0.5">
-            {fichaPrincipal.nomePrato} — Preço de venda: R$ {precoSugeridoVenda.toFixed(2)} (Custo ingredientes: R$ {custoBase.toFixed(2)})
-          </h2>
+        <div className="flex justify-between text-[#57423b]">
+          <span>Custo de fazer</span>
+          <span className="font-semibold text-[#9f3c16]">− R$ {custoPrato.toFixed(2)}</span>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {CANAIS_EXEMPLO.map((canal) => {
-            const margemRs = calcularMargemContribuicao(precoSugeridoVenda, custoBase, canal);
-            const margemPct = calcularMargemPercentual(margemRs, precoSugeridoVenda);
-            const taxaPctFormatada = (
-              canal.taxaPercentual > 1 ? canal.taxaPercentual : canal.taxaPercentual * 100
-            ).toFixed(1);
-
-            return (
-              <div
-                key={canal.id}
-                className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-3"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-zinc-900 text-sm">{canal.nome}</h3>
-                  <span className="text-[11px] font-semibold bg-zinc-200 text-zinc-700 px-2 py-0.5 rounded">
-                    Taxa: {taxaPctFormatada}%
-                  </span>
-                </div>
-
-                <div className="space-y-1 text-xs text-zinc-600">
-                  <div className="flex justify-between">
-                    <span>Preço de Venda:</span>
-                    <span className="font-medium">R$ {precoSugeridoVenda.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Custo do Lanche:</span>
-                    <span className="font-medium text-rose-600">- R$ {custoBase.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Taxas do Canal:</span>
-                    <span className="font-medium text-rose-600">
-                      - R$ {(precoSugeridoVenda * (canal.taxaPercentual > 1 ? canal.taxaPercentual / 100 : canal.taxaPercentual) + canal.taxaFixa).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-zinc-200 flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] text-zinc-500 block">Sobra em R$:</span>
-                    <span className="text-lg font-extrabold text-emerald-700">
-                      R$ {margemRs.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[11px] text-zinc-500 block">Margem %:</span>
-                    <span className="text-sm font-bold text-zinc-900">
-                      {margemPct.toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        {taxaTotal > 0 && (
+          <div className="flex justify-between text-[#57423b]">
+            <span>Taxa do canal ({(taxaPctDecimal * 100).toFixed(0)}%{canal.taxaFixa > 0 ? ` + R$ ${canal.taxaFixa.toFixed(2)}` : ""})</span>
+            <span className="font-semibold text-[#9f3c16]">− R$ {taxaTotal.toFixed(2)}</span>
+          </div>
+        )}
+        <div className="pt-2 border-t border-[#f5f4f0] flex justify-between">
+          <span className="font-bold text-[#1b1c1a]">Sobra por lanche</span>
+          <span className="font-bold text-xl" style={{ color }}>R$ {margem.toFixed(2)}</span>
         </div>
       </div>
 
-      <div className="bg-zinc-100/70 p-4 rounded-xl border border-dashed border-zinc-300 text-center text-xs text-zinc-500">
-        <TrendingUp className="w-5 h-5 mx-auto mb-1 text-zinc-400" />
-        Placeholder da tela de Margem por Canal. Gráficos interativos com Recharts serão implementados nas etapas visuais.
+      {/* Barra visual */}
+      <div className="h-2 rounded-full bg-[#f5f4f0] overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all"
+          style={{ width: `${Math.min(100, margemPct)}%`, backgroundColor: color }}
+        />
       </div>
     </div>
+  );
+}
+
+export default function MargemPage() {
+  return (
+    <main className="min-h-screen bg-[#faf9f5] px-8 py-8">
+      <div className="max-w-5xl mx-auto flex flex-col gap-6">
+
+        {/* Cabeçalho */}
+        <section>
+          <h1 className="text-[28px] font-bold text-[#1b1c1a] tracking-tight">
+            Preços e Margem por Canal
+          </h1>
+          <p className="text-sm text-[#57423b] mt-1">
+            Quanto sobra no seu bolso ao vender no Salão, Delivery próprio ou iFood
+          </p>
+        </section>
+
+        {/* Aviso de linguagem */}
+        <div className="p-4 rounded-[16px] bg-[#ffdcbb]/40 border border-[#ffdcbb] flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-[#855000] shrink-0 mt-0.5" />
+          <p className="text-xs text-[#57423b] leading-relaxed">
+            <strong className="text-[#1b1c1a]">Atenção:</strong> O valor de "sobra" mostrado aqui é a{" "}
+            <strong>margem de contribuição</strong> — ela ainda precisa pagar o aluguel, a equipe fixa e outras despesas do restaurante. Não é o lucro líquido final.
+          </p>
+        </div>
+
+        {/* Por ficha técnica */}
+        {FICHAS_EXEMPLO.map((ficha) => {
+          const custo = calcularCustoPrato(ficha, INSUMOS_EXEMPLO);
+          const preco = PRECOS_DEMO[ficha.id] ?? 35;
+          return (
+            <section key={ficha.id} className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-[#1b1c1a]">{ficha.nomePrato}</h2>
+                  <p className="text-xs text-[#57423b]">
+                    Custo de fazer: <strong className="text-[#1b1c1a]">R$ {custo.toFixed(2)}</strong>
+                    {" "}•{" "}
+                    Preço sugerido: <strong className="text-[#1b1c1a]">R$ {preco.toFixed(2)}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {CANAIS_EXEMPLO.map((canal) => (
+                  <CanalCard key={canal.id} canal={canal} custoPrato={custo} preco={preco} />
+                ))}
+              </div>
+            </section>
+          );
+        })}
+
+        {/* Comparativo rápido */}
+        <section className="bg-white rounded-[24px] border border-[#e3e2df]/50 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Info className="w-4 h-4 text-[#9f3c16]" />
+            <h2 className="text-sm font-bold text-[#1b1c1a]">Por que a margem cai tanto no iFood?</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            {[
+              { label: "Salão", taxa: "0% de taxa", cor: "#1b6b42", nota: "Maior margem" },
+              { label: "Delivery Próprio", taxa: "3,5% gateway", cor: "#855000", nota: "Boa alternativa" },
+              { label: "iFood", taxa: "23% + R$ 1,50", cor: "#9f3c16", nota: "Alto volume, menor sobra" },
+            ].map((item) => (
+              <div key={item.label} className="p-4 rounded-[16px] bg-[#faf9f5]">
+                <div className="text-sm font-bold text-[#1b1c1a]">{item.label}</div>
+                <div className="text-xs text-[#57423b] mt-0.5">{item.taxa}</div>
+                <div className="mt-2 text-xs font-semibold" style={{ color: item.cor }}>
+                  {item.nota}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }
