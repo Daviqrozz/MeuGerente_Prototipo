@@ -7,9 +7,6 @@ import {
   Package,
   ArrowUpRight,
   UtensilsCrossed,
-  CheckCircle2,
-  Clock,
-  ChevronRight,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -49,7 +46,7 @@ export default function HomePage() {
               </span>
               <span>•</span>
               <span className="font-medium">
-               Burger Craft Demo
+                Burger Craft Demo
               </span>
             </div>
           </div>
@@ -77,16 +74,18 @@ export default function HomePage() {
                   Estimativa
                 </span>
               </div>
-              <div className="text-[34px] font-bold text-[#1b1c1a] tracking-tight">
+              <div className="text-[36px] font-black text-[#1b1c1a] tracking-tight">
                 R$ 1.4k
               </div>
               <p className="text-xs text-[#57423b] mt-1">
-                42 lanches • ticket médio R$ 34
+                42 lanches • ticket médio <strong className="font-black text-[#1b1c1a]">R$ 34</strong>
               </p>
             </div>
 
             <div className="mt-8 pt-4 border-t border-[#f5f4f0] flex items-center justify-between text-xs">
-              <span className="text-[#57423b] font-medium">Meta do dia: R$ 2.000</span>
+              <span className="text-[#57423b] font-medium">
+                Meta do dia: <strong className="font-black text-[#1b1c1a]">R$ 2.000</strong>
+              </span>
               <span className="font-bold text-[#1b6b42] flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5" />
                 72% atingido
@@ -106,7 +105,7 @@ export default function HomePage() {
                   Estimativa
                 </span>
               </div>
-              <div className="text-[34px] font-bold text-[#1b1c1a] tracking-tight">
+              <div className="text-[36px] font-black text-[#1b1c1a] tracking-tight">
                 R$ 854
               </div>
               <p className="text-xs text-[#57423b] mt-1">
@@ -120,10 +119,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Card 3: Fluxo de Caixa (Donut Chart) */}
+          {/* Card 3: Fluxo de Caixa (Donut Chart com tamanho ampliado e legenda justa) */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#e3e2df]/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-base font-bold text-[#1b1c1a]">
                   Fluxo de Caixa
                 </span>
@@ -136,83 +135,87 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Donut Chart SVG */}
-              <div className="relative flex items-center justify-center my-3">
-                <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 160 160">
+              {/* Donut Chart SVG - Proporção aumentada para acomodar o número perfeitamente */}
+              <div className="relative flex items-center justify-center my-1.5">
+                <svg className="w-44 h-44 sm:w-48 sm:h-48 transform -rotate-90" viewBox="0 0 200 200">
                   {/* Background Track */}
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="52"
+                    cx="100"
+                    cy="100"
+                    r="78"
                     fill="transparent"
                     stroke="#f5f4f0"
-                    strokeWidth="20"
+                    strokeWidth="18"
                   />
-                  {/* Segment 1: Salão (50% = golden yellow #e5a800) */}
+                  {/* Segment 1: Salão (50% = golden yellow #d99b00) */}
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="52"
+                    cx="100"
+                    cy="100"
+                    r="78"
                     fill="transparent"
                     stroke="#d99b00"
-                    strokeWidth="20"
-                    strokeDasharray="163.36 326.72"
+                    strokeWidth="18"
+                    strokeDasharray="245.04 490.09"
                     strokeDashoffset="0"
                   />
                   {/* Segment 2: Delivery Próprio (~28% = light cream #e4e2dd) */}
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="52"
+                    cx="100"
+                    cy="100"
+                    r="78"
                     fill="transparent"
                     stroke="#e4e2dd"
-                    strokeWidth="20"
-                    strokeDasharray="91.48 326.72"
-                    strokeDashoffset="-163.36"
+                    strokeWidth="18"
+                    strokeDasharray="137.22 490.09"
+                    strokeDashoffset="-245.04"
                   />
                   {/* Segment 3: iFood (~22% = dark charcoal #30312e) */}
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="52"
+                    cx="100"
+                    cy="100"
+                    r="78"
                     fill="transparent"
                     stroke="#30312e"
-                    strokeWidth="20"
-                    strokeDasharray="71.88 326.72"
-                    strokeDashoffset="-254.84"
+                    strokeWidth="18"
+                    strokeDasharray="107.82 490.09"
+                    strokeDashoffset="-382.26"
                   />
                 </svg>
 
-                {/* Donut Center Hole Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                  <span className="text-[11px] font-medium text-[#8a726a]">Salão</span>
-                  <span className="text-base font-bold text-[#1b1c1a] leading-tight">
+                {/* Donut Center Hole Content com largura e respiro adequados */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2">
+                  <span className="text-xs font-semibold text-[#8a726a] leading-none mb-1">
+                    Salão
+                  </span>
+                  <span className="text-[18px] sm:text-[19px] font-black text-[#1b1c1a] tracking-tight leading-tight">
                     R$ 1.423,25
                   </span>
-                  <span className="text-[10px] text-[#8a726a]">50% das vendas</span>
+                  <span className="text-[11px] font-semibold text-[#8a726a] leading-none mt-1">
+                    50% das vendas
+                  </span>
                 </div>
               </div>
 
-              {/* Chart Legend */}
-              <div className="flex items-center justify-center gap-4 text-xs mt-1">
+              {/* Chart Legend - Espaçamento otimizado e compacto */}
+              <div className="flex items-center justify-center gap-3 text-xs mt-0.5">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#d99b00]" />
-                  <span className="text-[11px] text-[#57423b]">Salão</span>
+                  <span className="text-[11px] font-medium text-[#57423b]">Salão</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#e4e2dd]" />
-                  <span className="text-[11px] text-[#57423b]">Delivery próprio</span>
+                  <span className="text-[11px] font-medium text-[#57423b]">Delivery próprio</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#30312e]" />
-                  <span className="text-[11px] text-[#57423b]">iFood</span>
+                  <span className="text-[11px] font-medium text-[#57423b]">iFood</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-[#f5f4f0] text-center">
-              <span className="text-[10px] text-[#8a726a]">
-                Origem: distribuição simulada de R$ 2.846,50 • Confiança: Ilustrativa
+            <div className="mt-2.5 pt-2 border-t border-[#f5f4f0] text-center">
+              <span className="text-[10px] text-[#8a726a] leading-tight block">
+                Origem: distribuição simulada de <strong className="font-black text-[#1b1c1a]">R$ 2.846,50</strong> • Confiança: Ilustrativa
               </span>
             </div>
           </div>
@@ -315,7 +318,7 @@ export default function HomePage() {
                   </div>
 
                   <p className="text-xs text-[#57423b] ml-10 mb-1">
-                    O preço de compra passou de R$ 19,90 para R$ 21,90/kg.
+                    O preço de compra passou de <strong className="font-black text-[#1b1c1a]">R$ 19,90</strong> para <strong className="font-black text-[#9f3c16]">R$ 21,90</strong>/kg.
                   </p>
                   <p className="text-[10px] text-[#8a726a] ml-10 mb-3">
                     Preços de demonstração • Ficha técnica • 05 nov. 2026 • Confiança: Ilustrativa
@@ -374,7 +377,7 @@ export default function HomePage() {
               </div>
 
               {/* Big Stats */}
-              <div className="text-[32px] font-bold text-[#1b1c1a] tracking-tight mt-1">
+              <div className="text-[34px] font-black text-[#1b1c1a] tracking-tight mt-1">
                 R$ 2.846,50
               </div>
               <p className="text-xs text-[#8a726a] mt-0.5 mb-6">
@@ -432,7 +435,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 mt-4 text-xs font-semibold text-[#1b1c1a]">
                   <span className="w-2 h-2 rounded-full bg-[#d99b00]" />
                   <span>
-                    {horaSelecionada.hora} • {horaSelecionada.valor} em vendas simuladas
+                    {horaSelecionada.hora} • <strong className="font-black text-[#1b1c1a]">{horaSelecionada.valor}</strong> em vendas simuladas
                   </span>
                 </div>
               </div>
