@@ -37,25 +37,15 @@ export default function HomePage() {
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
           <div>
             <h1 className="text-3xl sm:text-[32px] font-bold text-[#1b1c1a] tracking-tight flex items-center gap-2">
-              Boa noite , Roberto <span className="text-2xl">👋</span>
+              Boa noite , Roberto <span className="text-2xl"></span>
             </h1>
             <div className="flex flex-wrap items-center gap-2.5 mt-2 text-xs text-[#8a726a]">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e2f7e0] text-[#1b6b42] font-semibold text-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#1b6b42]" />
                 Loja aberta
               </span>
-              <span>•</span>
-              <span className="font-medium">
-                Burger Craft Demo
-              </span>
+              
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f0eee9] text-[#57423b] text-xs font-semibold border border-[#e3e2df]/60 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#855000]" />
-              Demonstração
-            </span>
           </div>
         </header>
 
@@ -214,9 +204,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-2.5 pt-2 border-t border-[#f5f4f0] text-center">
-              <span className="text-[10px] text-[#8a726a] leading-tight block">
-                Origem: distribuição simulada de <strong className="font-black text-[#1b1c1a]">R$ 2.846,50</strong> • Confiança: Ilustrativa
-              </span>
+             
             </div>
           </div>
         </section>
