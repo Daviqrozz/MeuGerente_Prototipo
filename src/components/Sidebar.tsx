@@ -93,7 +93,7 @@ const NAV_APOIO: NavItem[] = [
   },
   {
     id: "whatsapp",
-    label: "WhatsApp Assistente",
+    label: "Meu gerente",
     href: "/whatsapp",
     icon: MessageCircle,
   },

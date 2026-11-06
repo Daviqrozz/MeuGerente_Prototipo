@@ -127,7 +127,7 @@ export default function WhatsAppPage() {
         {/* Cabeçalho */}
         <section>
           <h1 className="text-[28px] font-bold text-[#1b1c1a] tracking-tight">
-            WhatsApp Assistente
+            Meu gerente
           </h1>
           <p className="text-sm text-[#57423b] mt-1">
             Simulação de consultas operacionais com respostas baseadas nos dados reais da loja
