@@ -1,303 +1,447 @@
-import {
-  TAREFAS_EXEMPLO,
-  FICHAS_EXEMPLO,
-  INSUMOS_EXEMPLO,
-  CANAIS_EXEMPLO,
-} from "@/lib/dados";
-import {
-  calcularCustoPrato,
-  calcularMargemContribuicao,
-  calcularMargemPercentual,
-} from "@/lib/calculos";
-import { TrendingUp, AlertTriangle, CheckCircle2, Clock, ArrowRight } from "lucide-react";
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-
-// Cálculos reais dos dados demo
-const fichasBurger = FICHAS_EXEMPLO.slice(0, 3).map((ficha) => {
-  const custo = calcularCustoPrato(ficha, INSUMOS_EXEMPLO);
-  return { ficha, custo };
-});
-
-const canalIfood = CANAIS_EXEMPLO.find((c) => c.id === "canal-ifood")!;
-const canalSalao = CANAIS_EXEMPLO.find((c) => c.id === "canal-salao")!;
-
-// Simula preços de venda para demonstração
-const PRECO_DEMO = 34.0;
-const VENDAS_DEMO = 42;
-const TICKET_MEDIO = PRECO_DEMO;
-const FATURAMENTO_DEMO = VENDAS_DEMO * TICKET_MEDIO;
-
-// Margem média estimada (mistura de canais: 60% salão, 40% ifood)
-const custoMedioPrato = fichasBurger.reduce((s, { custo }) => s + custo, 0) / fichasBurger.length;
-const margemSalao = calcularMargemContribuicao(PRECO_DEMO, custoMedioPrato, canalSalao);
-const margemIfood = calcularMargemContribuicao(PRECO_DEMO, custoMedioPrato, canalIfood);
-const margemEstimada = margemSalao * 0.6 + margemIfood * 0.4;
-const margemEstimadaTotal = margemEstimada * VENDAS_DEMO;
-const margemPctMedia = calcularMargemPercentual(margemEstimada, PRECO_DEMO);
-
-const tarefasPendentes = TAREFAS_EXEMPLO.filter((t) => t.status !== "concluida");
-const maiorProblema = tarefasPendentes[0];
+import {
+  TrendingUp,
+  Package,
+  ArrowUpRight,
+  UtensilsCrossed,
+  CheckCircle2,
+  Clock,
+  ChevronRight,
+} from "lucide-react";
 
 export default function HomePage() {
-  return (
-    <main className="min-h-screen bg-[#faf9f5] px-8 py-8">
-      <div className="max-w-5xl mx-auto flex flex-col gap-8">
+  const [horaSelecionada, setHoraSelecionada] = useState<{
+    hora: string;
+    valor: string;
+  }>({
+    hora: "13h",
+    valor: "R$ 318,00",
+  });
 
-        {/* Cabeçalho de boas-vindas */}
-        <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  const [tarefaConcluidaId, setTarefaConcluidaId] = useState<string | null>(null);
+
+  const dadosHorarios = [
+    { hora: "11h", valor: "R$ 142,00", h1: 42, h2: 50 },
+    { hora: "12h", valor: "R$ 265,00", h1: 64, h2: 74 },
+    { hora: "13h", valor: "R$ 318,00", h1: 88, h2: 100, destaque: true },
+    { hora: "14h", valor: "R$ 115,00", h1: 36, h2: 30 },
+    { hora: "18h", valor: "R$ 210,00", h1: 56, h2: 66 },
+    { hora: "19h", valor: "R$ 280,00", h1: 72, h2: 80 },
+  ];
+
+  return (
+    <main className="w-full bg-[#faf9f5] px-6 sm:px-8 py-8 min-h-screen text-[#1b1c1a]">
+      <div className="max-w-6xl mx-auto flex flex-col gap-6 pb-16">
+        
+        {/* Cabeçalho de Boas-Vindas */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
           <div>
-            <h1 className="text-[32px] font-bold text-[#1b1c1a] tracking-tight leading-tight">
-              Boa noite, Roberto 👋
+            <h1 className="text-3xl sm:text-[32px] font-bold text-[#1b1c1a] tracking-tight flex items-center gap-2">
+              Boa noite , Roberto <span className="text-2xl">👋</span>
             </h1>
-            <div className="flex items-center gap-2 mt-1.5 text-sm text-[#57423b]">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#8ad7a5]/40 text-[#1b6b42] font-semibold text-xs">
+            <div className="flex flex-wrap items-center gap-2.5 mt-2 text-xs text-[#8a726a]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e2f7e0] text-[#1b6b42] font-semibold text-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#1b6b42]" />
                 Loja aberta
               </span>
-              <span className="text-[#57423b]/40">•</span>
-              <span>Dados de demonstração — Burger Craft Demo</span>
+              <span>•</span>
+              <span className="font-medium">
+               Burger Craft Demo
+              </span>
             </div>
           </div>
+
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#efeeea] text-[#57423b] text-xs font-medium">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f0eee9] text-[#57423b] text-xs font-semibold border border-[#e3e2df]/60 shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-[#855000]" />
               Demonstração
             </span>
           </div>
-        </section>
+        </header>
 
-        {/* 3 Cards de métricas principais */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Card Faturamento */}
-          <div className="p-7 rounded-[28px] bg-white border border-[#e3e2df]/50 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:shadow-md transition-shadow">
+        {/* 3 Cards de Métricas Principais (Topo) */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          
+          {/* Card 1: FATURAMENTO HOJE */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#e3e2df]/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#57423b]">
-                  Faturamento hoje
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8a726a]">
+                  FATURAMENTO HOJE
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#8ad7a5]/30 text-[#1b6b42] font-semibold text-[11px]">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#e2f7e0] text-[#1b6b42] text-[11px] font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#1b6b42]" />
                   Estimativa
                 </span>
               </div>
               <div className="text-[34px] font-bold text-[#1b1c1a] tracking-tight">
-                R$ {(FATURAMENTO_DEMO / 1000).toFixed(1).replace(".", ".")}k
+                R$ 1.4k
               </div>
-              <p className="text-xs text-[#57423b] mt-1 leading-relaxed">
-                {VENDAS_DEMO} lanches • ticket médio R$ {TICKET_MEDIO.toFixed(0)}
+              <p className="text-xs text-[#57423b] mt-1">
+                42 lanches • ticket médio R$ 34
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-[#f5f4f0] flex items-center justify-between text-xs">
-              <span className="text-[#57423b]">Meta do dia: R$ 2.000</span>
+
+            <div className="mt-8 pt-4 border-t border-[#f5f4f0] flex items-center justify-between text-xs">
+              <span className="text-[#57423b] font-medium">Meta do dia: R$ 2.000</span>
               <span className="font-bold text-[#1b6b42] flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" />
+                <TrendingUp className="w-3.5 h-3.5" />
                 72% atingido
               </span>
             </div>
           </div>
 
-          {/* Card Margem Estimada */}
-          <div className="p-7 rounded-[28px] bg-white border border-[#e3e2df]/50 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:shadow-md transition-shadow">
+          {/* Card 2: SOBRA ESTIMADA */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#e3e2df]/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#57423b]">
-                  Sobra estimada
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8a726a]">
+                  SOBRA ESTIMADA
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffdcbb]/60 text-[#855000] font-semibold text-[11px]">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ffdcbb]/70 text-[#855000] text-[11px] font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#855000]" />
                   Estimativa
                 </span>
               </div>
               <div className="text-[34px] font-bold text-[#1b1c1a] tracking-tight">
-                R$ {margemEstimadaTotal.toFixed(0).replace(/(\d)(?=(\d{3})+$)/, "$1.")}
+                R$ 854
               </div>
-              <p className="text-xs text-[#57423b] mt-1 leading-relaxed">
+              <p className="text-xs text-[#57423b] mt-1">
                 Já descontados insumos e taxas de canal
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-[#f5f4f0] flex items-center justify-between text-xs">
-              <span className="text-[#57423b]">Margem de contribuição</span>
-              <span className="font-bold text-[#1b1c1a]">~{margemPctMedia.toFixed(0)}% da venda</span>
+
+            <div className="mt-8 pt-4 border-t border-[#f5f4f0] flex items-center justify-between text-xs">
+              <span className="text-[#57423b] font-medium">Margem de contribuição</span>
+              <span className="font-bold text-[#1b1c1a]">~60% da venda</span>
             </div>
           </div>
 
-          {/* Card Maior Problema */}
-          <div className="p-7 rounded-[28px] bg-white border border-[#9f3c16]/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow">
+          {/* Card 3: Fluxo de Caixa (Donut Chart) */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#e3e2df]/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#57423b]">
-                  Atenção agora
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-base font-bold text-[#1b1c1a]">
+                  Fluxo de Caixa
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffdad6] text-[#ba1a1a] font-semibold text-[11px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]" />
-                  Alta
-                </span>
+                <Link
+                  href="/margem"
+                  className="w-7 h-7 rounded-full bg-[#f5f4f0] hover:bg-[#e4e2dd] flex items-center justify-center text-[#8a726a] hover:text-[#1b1c1a] transition-colors"
+                  title="Ver detalhes de margem"
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
               </div>
-              <div className="text-base font-bold text-[#1b1c1a] leading-snug">
-                {maiorProblema?.titulo.split(" ").slice(0, 7).join(" ")}…
+
+              {/* Donut Chart SVG */}
+              <div className="relative flex items-center justify-center my-3">
+                <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 160 160">
+                  {/* Background Track */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="52"
+                    fill="transparent"
+                    stroke="#f5f4f0"
+                    strokeWidth="20"
+                  />
+                  {/* Segment 1: Salão (50% = golden yellow #e5a800) */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="52"
+                    fill="transparent"
+                    stroke="#d99b00"
+                    strokeWidth="20"
+                    strokeDasharray="163.36 326.72"
+                    strokeDashoffset="0"
+                  />
+                  {/* Segment 2: Delivery Próprio (~28% = light cream #e4e2dd) */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="52"
+                    fill="transparent"
+                    stroke="#e4e2dd"
+                    strokeWidth="20"
+                    strokeDasharray="91.48 326.72"
+                    strokeDashoffset="-163.36"
+                  />
+                  {/* Segment 3: iFood (~22% = dark charcoal #30312e) */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="52"
+                    fill="transparent"
+                    stroke="#30312e"
+                    strokeWidth="20"
+                    strokeDasharray="71.88 326.72"
+                    strokeDashoffset="-254.84"
+                  />
+                </svg>
+
+                {/* Donut Center Hole Content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                  <span className="text-[11px] font-medium text-[#8a726a]">Salão</span>
+                  <span className="text-base font-bold text-[#1b1c1a] leading-tight">
+                    R$ 1.423,25
+                  </span>
+                  <span className="text-[10px] text-[#8a726a]">50% das vendas</span>
+                </div>
               </div>
-              <p className="text-xs text-[#57423b] mt-2 leading-relaxed">
-                Origem: {maiorProblema?.alertaOrigem.slice(0, 50)}…
-              </p>
+
+              {/* Chart Legend */}
+              <div className="flex items-center justify-center gap-4 text-xs mt-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#d99b00]" />
+                  <span className="text-[11px] text-[#57423b]">Salão</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#e4e2dd]" />
+                  <span className="text-[11px] text-[#57423b]">Delivery próprio</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#30312e]" />
+                  <span className="text-[11px] text-[#57423b]">iFood</span>
+                </div>
+              </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-[#f5f4f0] flex items-center justify-between text-xs">
-              <span className="text-[#57423b]">Responsável: {maiorProblema?.responsavel.split(" ")[0]}</span>
-              <Link href="/tarefas" className="font-bold text-[#9f3c16] flex items-center gap-1 hover:underline">
-                Ver tarefa <ArrowRight className="w-3 h-3" />
-              </Link>
+
+            <div className="mt-4 pt-3 border-t border-[#f5f4f0] text-center">
+              <span className="text-[10px] text-[#8a726a]">
+                Origem: distribuição simulada de R$ 2.846,50 • Confiança: Ilustrativa
+              </span>
             </div>
           </div>
         </section>
 
-        {/* Grid inferior: Tarefas + Canais */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* O que fazer agora */}
-          <div className="p-7 rounded-[28px] bg-white border border-[#e3e2df]/50 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-[#1b1c1a] flex items-center gap-2">
-                <CheckSquareIcon />
-                O que fazer agora
-              </h2>
-              <span className="text-xs text-[#57423b]">{tarefasPendentes.length} pendentes</span>
-            </div>
-            <div className="space-y-3">
-              {tarefasPendentes.slice(0, 2).map((tarefa) => {
-                const dotColor =
-                  tarefa.prioridade === "alta"
-                    ? "#9f3c16"
-                    : tarefa.prioridade === "media"
-                    ? "#855000"
-                    : "#1b6b42";
-                return (
-                  <div
-                    key={tarefa.id}
-                    className="p-4 rounded-2xl bg-[#f5f4f0]/70 flex items-center justify-between gap-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-2 h-2 rounded-full shrink-0"
-                        style={{ backgroundColor: dotColor }}
-                      />
-                      <div>
-                        <p className="text-sm font-semibold text-[#1b1c1a] leading-tight line-clamp-2">
-                          {tarefa.titulo.split(" ").slice(0, 8).join(" ")}…
-                        </p>
-                        <p className="text-xs text-[#57423b] mt-0.5">
-                          Prazo: {tarefa.prazo} • {tarefa.responsavel.split(" ")[0]}
-                        </p>
+        {/* Linha Inferior: O que fazer agora + Movimento do dia */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Coluna Esquerda: O que fazer agora (lg:col-span-7) */}
+          <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 border border-[#e3e2df]/60 shadow-xs flex flex-col justify-between">
+            <div>
+              {/* Header do Card */}
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-[#1b1c1a]">
+                    O que fazer agora
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-full bg-[#f0eee9] text-[#57423b] text-xs font-bold">
+                    3
+                  </span>
+                </div>
+                <Link
+                  href="/tarefas"
+                  className="text-xs font-semibold text-[#57423b] hover:text-[#1b1c1a] flex items-center gap-1 transition-colors"
+                >
+                  <span>Todas as tarefas</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <p className="text-xs text-[#8a726a] mb-5">
+                Uma coisa de cada vez. Você tem o controle.
+              </p>
+
+              {/* Lista de Tarefas */}
+              <div className="space-y-3.5">
+                
+                {/* Tarefa 1 */}
+                <div
+                  className={`rounded-2xl p-4 bg-[#faf9f5] border border-[#e3e2df]/50 transition-all ${
+                    tarefaConcluidaId === "t1" ? "opacity-60 bg-[#e2f7e0]/30" : "hover:border-[#dec0b7]"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#e3e2df]/60 flex items-center justify-center text-[#9f3c16] shadow-2xs">
+                        <Package className="w-4 h-4" />
                       </div>
+                      <h3 className="text-sm font-bold text-[#1b1c1a]">
+                        Comprar frango antes do jantar
+                      </h3>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ffdad6] text-[#ba1a1a] text-[11px] font-bold shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]" />
+                      Prioridade alta
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-[#57423b] ml-10 mb-1">
+                    Restam 2 kg; o mínimo definido é 5 kg.
+                  </p>
+                  <p className="text-[10px] text-[#8a726a] ml-10 mb-3">
+                    Estoque de demonstração • Peito de frango • 05 nov. 2026 • Confiança: Ilustrativa
+                  </p>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-[#e3e2df]/40 ml-10">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full bg-[#e4e2dd] text-[#1b1c1a] flex items-center justify-center text-[10px] font-bold">
+                        A
+                      </div>
+                      <span className="text-xs text-[#57423b] font-medium">Ana</span>
                     </div>
                     <Link
-                      href="/tarefas"
-                      className="px-3.5 py-1.5 rounded-full bg-white text-[#1b1c1a] hover:bg-[#f5f4f0] font-semibold text-xs border border-[#e3e2df] shadow-sm shrink-0 transition-colors"
+                      href="/insumos"
+                      className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#f5f4f0] text-xs font-semibold text-[#1b1c1a] border border-[#e3e2df] shadow-2xs flex items-center gap-1 transition-colors"
                     >
-                      Ver
+                      <span>Resolver</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
-                );
-              })}
-            </div>
-            <div className="mt-5 pt-3 flex items-center justify-end">
-              <Link
-                href="/tarefas"
-                className="text-xs font-semibold text-[#9f3c16] hover:underline flex items-center gap-1"
-              >
-                Ver todas as tarefas <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
+                </div>
 
-          {/* Comparativo de Canais */}
-          <div className="p-7 rounded-[28px] bg-white border border-[#e3e2df]/50 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-[#1b1c1a] flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#1b6b42]" strokeWidth={1.8} />
-                Sobra por canal
-              </h2>
-              <span className="text-xs text-[#57423b]">Cheeseburger Clássico</span>
-            </div>
-
-            <div className="space-y-3">
-              {CANAIS_EXEMPLO.map((canal) => {
-                const custo = fichasBurger[0].custo;
-                const margemRs = calcularMargemContribuicao(PRECO_DEMO, custo, canal);
-                const margemPct = calcularMargemPercentual(margemRs, PRECO_DEMO);
-                const barWidth = Math.max(10, Math.min(100, margemPct));
-                return (
-                  <div key={canal.id} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-[#1b1c1a]">{canal.nome.split(" ")[0]}</span>
-                      <span className="font-bold text-[#1b6b42]">
-                        R$ {margemRs.toFixed(2)} <span className="text-[#57423b] font-normal">({margemPct.toFixed(0)}%)</span>
-                      </span>
+                {/* Tarefa 2 */}
+                <div
+                  className={`rounded-2xl p-4 bg-[#faf9f5] border border-[#e3e2df]/50 transition-all ${
+                    tarefaConcluidaId === "t2" ? "opacity-60 bg-[#e2f7e0]/30" : "hover:border-[#dec0b7]"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#e3e2df]/60 flex items-center justify-center text-[#855000] shadow-2xs">
+                        <TrendingUp className="w-4 h-4" />
+                      </div>
+                      <h3 className="text-sm font-bold text-[#1b1c1a]">
+                        Revisar preço do frango no iFood
+                      </h3>
                     </div>
-                    <div className="h-2 rounded-full bg-[#f5f4f0] overflow-hidden">
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${barWidth}%`,
-                          backgroundColor:
-                            margemPct >= 50 ? "#1b6b42" : margemPct >= 30 ? "#855000" : "#9f3c16",
-                        }}
-                      />
-                    </div>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#e4e2dd] text-[#57423b] text-[11px] font-semibold shrink-0">
+                      Revisar hoje
+                    </span>
                   </div>
-                );
-              })}
-            </div>
 
-            <div className="mt-5 pt-3 flex items-center justify-between text-xs text-[#57423b]">
-              <div className="flex items-center gap-1">
-                <AlertTriangle className="w-3.5 h-3.5 text-[#855000]" />
-                <span>Margem ≠ lucro líquido</span>
+                  <p className="text-xs text-[#57423b] ml-10 mb-1">
+                    O preço de compra passou de R$ 19,90 para R$ 21,90/kg.
+                  </p>
+                  <p className="text-[10px] text-[#8a726a] ml-10 mb-3">
+                    Preços de demonstração • Ficha técnica • 05 nov. 2026 • Confiança: Ilustrativa
+                  </p>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-[#e3e2df]/40 ml-10">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full bg-[#e4e2dd] text-[#1b1c1a] flex items-center justify-center text-[10px] font-bold">
+                        J
+                      </div>
+                      <span className="text-xs text-[#57423b] font-medium">João</span>
+                    </div>
+                    <Link
+                      href="/calculadora"
+                      className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#f5f4f0] text-xs font-semibold text-[#1b1c1a] border border-[#e3e2df] shadow-2xs flex items-center gap-1 transition-colors"
+                    >
+                      <span>Resolver</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Tarefa 3 */}
+                <div className="rounded-2xl p-3.5 bg-[#faf9f5] border border-[#e3e2df]/50 flex items-center justify-between hover:border-[#dec0b7] transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-white border border-[#e3e2df]/60 flex items-center justify-center text-[#1b6b42] shadow-2xs">
+                      <UtensilsCrossed className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-sm font-bold text-[#1b1c1a]">
+                      Confirmar rendimento da carne
+                    </h3>
+                  </div>
+                  <Link
+                    href="/fichas"
+                    className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#f5f4f0] text-xs font-semibold text-[#57423b] hover:text-[#1b1c1a] border border-[#e3e2df] shadow-2xs transition-colors"
+                  >
+                    Conferir ficha
+                  </Link>
+                </div>
+
               </div>
-              <Link
-                href="/margem"
-                className="font-semibold text-[#9f3c16] hover:underline flex items-center gap-1"
-              >
-                Detalhar <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
             </div>
           </div>
+
+          {/* Coluna Direita: Movimento do dia (lg:col-span-5) */}
+          <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 border border-[#e3e2df]/60 shadow-xs flex flex-col justify-between">
+            <div>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-lg font-bold text-[#1b1c1a]">
+                  Movimento do dia
+                </h2>
+                <span className="px-3 py-1 rounded-full bg-[#f0eee9] text-[#57423b] text-xs font-semibold">
+                  Vendas por horário
+                </span>
+              </div>
+
+              {/* Big Stats */}
+              <div className="text-[32px] font-bold text-[#1b1c1a] tracking-tight mt-1">
+                R$ 2.846,50
+              </div>
+              <p className="text-xs text-[#8a726a] mt-0.5 mb-6">
+                47 vendas no cenário de demonstração
+              </p>
+
+              {/* Vertical Histogram Bars */}
+              <div className="pt-2 pb-4">
+                <div className="h-44 flex items-end justify-between gap-2 px-2 border-b border-[#f5f4f0] pb-2">
+                  {dadosHorarios.map((d) => {
+                    const isSelected = horaSelecionada.hora === d.hora;
+                    return (
+                      <button
+                        key={d.hora}
+                        type="button"
+                        onClick={() => setHoraSelecionada({ hora: d.hora, valor: d.valor })}
+                        className="flex-1 flex flex-col items-center gap-1 group cursor-pointer"
+                        title={`${d.hora}: ${d.valor}`}
+                      >
+                        <div className="flex items-end gap-1 w-full justify-center h-36">
+                          {/* Barra 1 */}
+                          <div
+                            style={{ height: `${d.h1}%` }}
+                            className={`w-2.5 rounded-full transition-all duration-300 ${
+                              d.destaque || isSelected
+                                ? "bg-[#d99b00] group-hover:bg-[#b88200]"
+                                : "bg-[#e4e2dd] group-hover:bg-[#d0cec8]"
+                            }`}
+                          />
+                          {/* Barra 2 */}
+                          <div
+                            style={{ height: `${d.h2}%` }}
+                            className={`w-2.5 rounded-full transition-all duration-300 ${
+                              d.destaque || isSelected
+                                ? "bg-[#d99b00] group-hover:bg-[#b88200]"
+                                : "bg-[#e4e2dd] group-hover:bg-[#d0cec8]"
+                            }`}
+                          />
+                        </div>
+                        <span
+                          className={`text-xs mt-2 transition-colors ${
+                            d.destaque || isSelected
+                              ? "font-bold text-[#1b1c1a]"
+                              : "text-[#8a726a]"
+                          }`}
+                        >
+                          {d.hora}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Subtitle / Selected Hour Indicator */}
+                <div className="flex items-center gap-2 mt-4 text-xs font-semibold text-[#1b1c1a]">
+                  <span className="w-2 h-2 rounded-full bg-[#d99b00]" />
+                  <span>
+                    {horaSelecionada.hora} • {horaSelecionada.valor} em vendas simuladas
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </section>
 
-        {/* Acesso Rápido */}
-        <section>
-          <h2 className="text-sm font-bold text-[#57423b] uppercase tracking-wider mb-4">
-            Acesso Rápido
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { href: "/insumos", emoji: "📦", label: "Insumos", sub: `${INSUMOS_EXEMPLO.length} cadastrados` },
-              { href: "/fichas", emoji: "🍔", label: "Fichas", sub: `${FICHAS_EXEMPLO.length} pratos` },
-              { href: "/calculadora", emoji: "🧮", label: "Calculadora", sub: "Preço sugerido" },
-              { href: "/whatsapp", emoji: "💬", label: "Assistente", sub: "Perguntas rápidas" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="p-5 rounded-[20px] bg-white border border-[#e3e2df]/50 hover:border-[#9f3c16]/30 hover:shadow-md transition-all group"
-              >
-                <span className="text-2xl block mb-2">{item.emoji}</span>
-                <p className="text-sm font-bold text-[#1b1c1a] group-hover:text-[#9f3c16] transition-colors">
-                  {item.label}
-                </p>
-                <p className="text-xs text-[#57423b] mt-0.5">{item.sub}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
       </div>
     </main>
   );
 }
-
-function CheckSquareIcon() {
-  return (
-    <svg className="w-5 h-5 text-[#9f3c16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 11l3 3L22 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-    </svg>
-  );
-}
-
-

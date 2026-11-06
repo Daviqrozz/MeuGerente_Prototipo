@@ -49,7 +49,7 @@ export function Sidebar() {
 
         {/* Loja ativa */}
         <div className="px-4 pb-2">
-          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-white border border-[#e3e2df]/60 shadow-sm">
+          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-white border border-[#e3e2df]/60 shadow-xs">
             <div className="flex items-center gap-2.5 overflow-hidden">
               <span className="w-2 h-2 rounded-full bg-[#1b6b42] shrink-0" />
               <div className="truncate">
@@ -71,7 +71,7 @@ export function Sidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl transition-all text-[13px] font-semibold ${
                   isActive
-                    ? "bg-[#9f3c16] text-white shadow-sm"
+                    ? "bg-[#822801] text-white shadow-sm"
                     : "text-[#57423b] hover:bg-[#efeeea] hover:text-[#1b1c1a]"
                 }`}
               >
@@ -83,20 +83,20 @@ export function Sidebar() {
 
           {/* Divisor Apoio */}
           <div className="pt-4 pb-1 px-3">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-[#57423b]/70">Apoio</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider text-[#57423b]/70">APOIO</span>
           </div>
 
           {NAV_APOIO.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
-            const badge = item.href === "/tarefas" && pendentes > 0 ? pendentes : null;
+            const badge = item.href === "/tarefas" ? 3 : null;
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`flex items-center justify-between px-4 py-2.5 rounded-2xl transition-all text-[13px] font-semibold ${
                   isActive
-                    ? "bg-[#9f3c16] text-white shadow-sm"
+                    ? "bg-[#822801] text-white shadow-sm"
                     : "text-[#57423b] hover:bg-[#efeeea] hover:text-[#1b1c1a]"
                 }`}
               >
@@ -105,7 +105,7 @@ export function Sidebar() {
                   <span>{item.label}</span>
                 </div>
                 {badge && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#9f3c16]/15 text-[#9f3c16] font-bold text-[11px]">
+                  <span className="px-2 py-0.5 rounded-full bg-[#ffdcbb] text-[#855000] font-bold text-[11px]">
                     {badge}
                   </span>
                 )}
@@ -117,20 +117,21 @@ export function Sidebar() {
 
       {/* Usuário no rodapé */}
       <div className="p-4">
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e3e2df]/60 flex items-center justify-between shadow-sm">
+        <div className="p-3.5 rounded-2xl bg-white border border-[#e3e2df]/60 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#9f3c16]/15 text-[#9f3c16] flex items-center justify-center font-bold text-xs">
-              RB
+            <div className="w-8 h-8 rounded-full bg-[#1b1c19] text-white flex items-center justify-center font-bold text-xs">
+              N
             </div>
             <div>
               <p className="text-xs font-semibold text-[#1b1c1a]">Roberto</p>
               <p className="text-[11px] text-[#57423b]">Dono da Loja</p>
             </div>
           </div>
-          <Settings className="w-4 h-4 text-[#57423b]/70" strokeWidth={1.8} />
+          <button type="button" className="text-[#57423b]/70 hover:text-[#1b1c1a] transition-colors" title="Configurações">
+            <Settings className="w-4 h-4" strokeWidth={1.8} />
+          </button>
         </div>
       </div>
     </aside>
   );
 }
-
